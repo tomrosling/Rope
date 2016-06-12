@@ -72,6 +72,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Integrator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DebugRender.cpp" />
@@ -79,6 +80,7 @@
     <ClCompile Include="Rope.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Integrator.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="DebugRender.h" />

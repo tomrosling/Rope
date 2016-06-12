@@ -11,7 +11,7 @@ struct Vec3;
 class DebugRender
 {
 public:
-	static void Initialise();
+	static void Initialise(int windowSizeX, int windowSizeY);
 	static void Shutdown();
 
 	static void Line(const Vec3& a, const Vec3& b, const sf::Color& colour);

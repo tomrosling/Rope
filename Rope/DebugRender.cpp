@@ -7,8 +7,31 @@
 
 GLUquadric* DebugRender::s_quadric = NULL;
 
-void DebugRender::Initialise()
+void DebugRender::Initialise(int windowSizeX, int windowSizeY)
 {
+	// Set up the Z-buffer
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glClearDepth(1.f);
+
+	// Set up lighting
+	GLfloat	globalAmbient[] = { 0.3f, 0.3f, 0.3f, 1.f };
+	GLfloat light0AmbDiff[] = { 0.9f, 0.9f, 0.7f, 1.f };
+	GLfloat light0Pos[] = { 0.f, 0.f, 5.f, 1.0 };
+	glEnable(GL_LIGHTING);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+	glLightfv(GL_LIGHT0, GL_AMBIENT_AND_DIFFUSE, light0AmbDiff);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
+	glEnable(GL_LIGHT0);
+
+	// Setup the viewport and perspective projection
+	glViewport(0, 0, windowSizeX, windowSizeY);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	GLfloat ratio = static_cast<float>(windowSizeX) / static_cast<float>(windowSizeY);
+	gluPerspective(75.f, ratio, 1.f, 50.f);
+
+	// Create a quadrics object for glu rendering
 	s_quadric = gluNewQuadric();
 	assert(s_quadric);
 }
