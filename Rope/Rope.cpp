@@ -1,6 +1,7 @@
 #include "Rope.h"
-#include "DebugRender.h"
 #include <cassert>
+#include <SFML/Graphics/Color.hpp>
+#include "DebugRender.h"
 
 Particle::Particle(const Vec3& pos, float mass, Particle* prev)
 	: m_pos(pos)
@@ -67,7 +68,7 @@ void Rope::Render(GLUquadric& quadric) const
 	if (!m_particles.empty())
 	{
 		static const float radius = 0.02f;
-		static const Vec3 brown(0.54f, 0.27f, 0.08f);
+		static const sf::Color brown(139, 69, 19);
 
 		for (const Particle& p : m_particles)
 		{

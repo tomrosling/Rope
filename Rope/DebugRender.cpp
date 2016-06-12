@@ -1,9 +1,10 @@
 #include "DebugRender.h"
 #include <SFML/OpenGL.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <gl/GLU.h>
 #include "Maths.h"
 
-void DebugRender::Line(const Vec3& a, const Vec3& b, const Vec3& colour)
+void DebugRender::Line(const Vec3& a, const Vec3& b, const sf::Color& colour)
 {
 	SetColour(colour);
 
@@ -13,7 +14,7 @@ void DebugRender::Line(const Vec3& a, const Vec3& b, const Vec3& colour)
 	glEnd();
 }
 
-void DebugRender::Quad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const Vec3& colour)
+void DebugRender::Quad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d, const sf::Color& colour)
 {
 	SetColour(colour);
 
@@ -27,7 +28,7 @@ void DebugRender::Quad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& 
 	glEnd();
 }
 
-void DebugRender::Sphere(GLUquadric& quadric, const Vec3& point, float radius, const Vec3& colour)
+void DebugRender::Sphere(GLUquadric& quadric, const Vec3& point, float radius, const sf::Color& colour)
 {
 	SetColour(colour);
 
@@ -37,7 +38,7 @@ void DebugRender::Sphere(GLUquadric& quadric, const Vec3& point, float radius, c
 	glPopMatrix();
 }
 
-void DebugRender::Cylinder(GLUquadric& quadric, const Vec3& a, const Vec3& b, float radius, const Vec3& colour)
+void DebugRender::Cylinder(GLUquadric& quadric, const Vec3& a, const Vec3& b, float radius, const sf::Color& colour)
 {
 	SetColour(colour);
 
@@ -53,8 +54,8 @@ void DebugRender::Cylinder(GLUquadric& quadric, const Vec3& a, const Vec3& b, fl
 	glPopMatrix();
 }
 
-void DebugRender::SetColour(const Vec3& colour)
+void DebugRender::SetColour(const sf::Color& colour)
 {
-	GLfloat colourGL[] = { colour.x, colour.y, colour.z, 1.f };
+	GLfloat colourGL[] = { static_cast<float>(colour.r) / 255.f, static_cast<float>(colour.g) / 255.f, static_cast<float>(colour.b) / 255.f, 1.f };
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, colourGL);
 }

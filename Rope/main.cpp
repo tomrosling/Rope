@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 			// Cast the mouse onto a plane around the last particle of the rope, with a normal of the camera forward vector (i.e. grab at a fixed distance)
 			float t = (rope.m_particles.back().m_pos - mousePosFrontClipPlane).Dot(lookDir) / rayDir.Dot(lookDir);
 			Vec3 castPoint = mousePosFrontClipPlane + rayDir * t;
-			DebugRender::Sphere(*quadric, castPoint, 0.1f, Vec3(1.f, 0.f, 0.f));
+			DebugRender::Sphere(*quadric, castPoint, 0.1f, sf::Color::Red);
 
 			bool isMousePressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 
@@ -242,16 +242,11 @@ int main(int argc, char** argv)
 
 
 		glMatrixMode(GL_MODELVIEW);
-		
-		unsigned int blue = 0xffffff00;
-		//glColor4ubv(reinterpret_cast<const GLubyte*>(&blue));
 
-		unsigned int red = 0xff0000ff;
-		//glColor4ubv(reinterpret_cast<const GLubyte*>(&red));
 		rope.Render(*quadric);
 
-
-		DebugRender::Quad(Vec3(-5.f, -5.f, -5.f), Vec3(-5.f, -5.f, 5.f), Vec3(5.f, -5.f, 5.f), Vec3(5.f, -5.f, -5.f), Vec3(0.5f, 0.5f, 0.5f));
+		// Render a ground plane
+		DebugRender::Quad(Vec3(-5.f, -5.f, -5.f), Vec3(-5.f, -5.f, 5.f), Vec3(5.f, -5.f, 5.f), Vec3(5.f, -5.f, -5.f), sf::Color(128, 128, 128));
 
 		// Finally, display the rendered frame on screen
 		window.display();
