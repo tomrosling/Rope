@@ -75,12 +75,14 @@
     <ClCompile Include="Integrator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DebugRender.cpp" />
+    <ClCompile Include="Picker.cpp" />
     <ClCompile Include="Rope.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Integrator.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="DebugRender.h" />
+    <ClInclude Include="Picker.h" />
     <ClInclude Include="Rope.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

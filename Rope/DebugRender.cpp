@@ -2,7 +2,21 @@
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <gl/GLU.h>
+#include <cassert>
 #include "Maths.h"
+
+GLUquadric* DebugRender::s_quadric = NULL;
+
+void DebugRender::Initialise()
+{
+	s_quadric = gluNewQuadric();
+	assert(s_quadric);
+}
+
+void DebugRender::Shutdown()
+{
+	gluDeleteQuadric(s_quadric);
+}
 
 void DebugRender::Line(const Vec3& a, const Vec3& b, const sf::Color& colour)
 {
@@ -28,17 +42,17 @@ void DebugRender::Quad(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& 
 	glEnd();
 }
 
-void DebugRender::Sphere(GLUquadric& quadric, const Vec3& point, float radius, const sf::Color& colour)
+void DebugRender::Sphere(const Vec3& point, float radius, const sf::Color& colour)
 {
 	SetColour(colour);
 
 	glPushMatrix();
 	glTranslatef(point.x, point.y, point.z);
-	gluSphere(&quadric, radius, 12, 12);
+	gluSphere(s_quadric, radius, 12, 12);
 	glPopMatrix();
 }
 
-void DebugRender::Cylinder(GLUquadric& quadric, const Vec3& a, const Vec3& b, float radius, const sf::Color& colour)
+void DebugRender::Cylinder(const Vec3& a, const Vec3& b, float radius, const sf::Color& colour)
 {
 	SetColour(colour);
 
@@ -50,7 +64,7 @@ void DebugRender::Cylinder(GLUquadric& quadric, const Vec3& a, const Vec3& b, fl
 	glPushMatrix();
 	glTranslatef(a.x, a.y, a.z);
 	glRotatef(angle * 180.f / PI, axis.x, axis.y, axis.z);
-	gluCylinder(&quadric, radius, radius, delta.Mag(), 12, 12);
+	gluCylinder(s_quadric, radius, radius, delta.Mag(), 12, 12);
 	glPopMatrix();
 }
 

@@ -8,6 +8,7 @@
 #include "Maths.h"
 #include "Rope.h"
 #include "Integrator.h"
+#include "Picker.h"
 #include "DebugRender.h"
 
 
@@ -54,23 +55,21 @@ int main(int argc, char** argv)
 	GLfloat ratio = static_cast<float>(window.getSize().x) / static_cast<float>(window.getSize().y);
 	gluPerspective(75.f, ratio, 1.f, 50.f);
 
-	// Quadrics object for drawing shapes
-	GLUquadric* quadric = gluNewQuadric();
-	if (!quadric)
-		return 1;
+	DebugRender::Initialise();
 
 	Rope rope;
 	Vec3 startPos(0.f, 3.f, 0.f);
 	rope.AddParticle(startPos, 0.f);
-	static const int numParticles = 10;
-	static const float separation = 0.5f;
+	static const int numParticles = 20;
+	static const float separation = 0.25f;
 	for (int i = 1; i < numParticles; ++i)
 	{
 		rope.AddParticle(startPos + Vec3(static_cast<float>(i) * separation, 0.f, 0.f), 1.f);
 	}
-	rope.AddParticle(startPos + Vec3(static_cast<float>(numParticles) * separation, 0.f, 0.f), 20.f);
+	//rope.AddParticle(startPos + Vec3(static_cast<float>(numParticles) * separation, 0.f, 0.f), 20.f);
 
 	Integrator integrator;
+	Picker picker;
 
 	// Create a clock for measuring the time elapsed
 	sf::Clock clock;
@@ -115,10 +114,14 @@ int main(int argc, char** argv)
 		// Slowly rotate the camera
 		static const float camRadius = 5.f;
 		static float camTheta = PI / 2.f;
-		camTheta += 0.25f * dt;
-		while (camTheta > 2.f * PI)
+
+		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
-			camTheta -= 2.f * PI;
+			camTheta += 0.25f * dt;
+			while (camTheta > 2.f * PI)
+			{
+				camTheta -= 2.f * PI;
+			}
 		}
 
 		Vec3 camPos(camRadius * cosf(camTheta), 0.f, camRadius * sinf(camTheta));
@@ -129,66 +132,13 @@ int main(int argc, char** argv)
 			camLookAt.x, camLookAt.y, camLookAt.z,
 			0.f, 1.f, 0.f);
 
-		// Project the mouse position onto the plane
-		sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-
-		// Clamp the mouse position to the window, so we don't get crazy results from gluUnProject
-		sf::Vector2u windowSize = window.getSize();
-		mousePos.x = Clamp(mousePos.x, 0, static_cast<int>(windowSize.x));
-		mousePos.y = Clamp(mousePos.y, 0, static_cast<int>(windowSize.y));
-
-		Vec3 mousePos3(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y), 0.f);
-		
-		// Get the mouse position in world space (at the front of the view frustum)
-		double modelMtx[16];
-		glGetDoublev(GL_MODELVIEW_MATRIX, modelMtx);
-
-		double projMtx[16];
-		glGetDoublev(GL_PROJECTION_MATRIX, projMtx);
-
-		int viewport[4];
-		glGetIntegerv(GL_VIEWPORT, viewport);
-
-		double castX, castY, castZ;
-		gluUnProject(static_cast<float>(mousePos.x), static_cast<float>(windowSize.y - mousePos.y), 0.f,
-			modelMtx, projMtx, viewport,
-			&castX, &castY, &castZ);
-
-		Vec3 mousePosFrontClipPlane(static_cast<float>(castX), static_cast<float>(castY), static_cast<float>(castZ));
-		Vec3 rayDir = (mousePosFrontClipPlane - camPos).GetNormalised();
-		Vec3 lookDir = (camLookAt - camPos).GetNormalised();
-
-		// Cast the mouse onto a plane around the last particle of the rope, with a normal of the camera forward vector (i.e. grab at a fixed distance)
-		float t = (rope.m_particles.back().m_pos - mousePosFrontClipPlane).Dot(lookDir) / rayDir.Dot(lookDir);
-		Vec3 castPoint = mousePosFrontClipPlane + rayDir * t;
-		DebugRender::Sphere(*quadric, castPoint, 0.1f, sf::Color::Red);
-
-		// Add a fake particle to the rope based on the mouse position
-		bool isMousePressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-		static Particle* mouseParticle = NULL;
-		if (isMousePressed)
-		{
-			if (mouseParticle)
-			{
-				mouseParticle->m_pos = castPoint;
-			}
-			else
-			{
-				rope.AddParticle(castPoint, 0.f);
-				mouseParticle = &rope.m_particles.back();
-			}
-		}
-		else if (!isMousePressed && mouseParticle)
-		{
-			mouseParticle = NULL;
-			rope.m_particles.pop_back();
-		}
+		picker.Pick(window, camPos, camLookAt, rope);
 
 		integrator.Integrate(rope, dt);
 
 		glMatrixMode(GL_MODELVIEW);
 
-		rope.Render(*quadric);
+		rope.Render();
 
 		// Render a ground plane
 		DebugRender::Quad(Vec3(-5.f, -5.f, -5.f), Vec3(-5.f, -5.f, 5.f), Vec3(5.f, -5.f, 5.f), Vec3(5.f, -5.f, -5.f), sf::Color(128, 128, 128));
@@ -197,7 +147,7 @@ int main(int argc, char** argv)
 		window.display();
 	}
 
-	gluDeleteQuadric(quadric);
+	DebugRender::Shutdown();
 
 	return 0;
 }

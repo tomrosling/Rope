@@ -2,9 +2,7 @@
 #include <vector>
 #include "Maths.h"
 
-class GLUquadric;
-
-class Particle
+struct Particle
 {
 public:
 	Particle(const Vec3& pos, float mass, Particle* prev);
@@ -22,8 +20,10 @@ class Rope
 public:
 	void Integrate(float dt);
 	void SolveConstraints(float dt);
-	void Render(GLUquadric& quadric) const;
+	void Render() const;
 	void AddParticle(const Vec3& pos, float mass);
+	Particle* GetLastParticle();
 
+private:
 	std::vector<Particle> m_particles;
 };

@@ -61,7 +61,7 @@ void Rope::SolveConstraints(float dt)
 	}
 }
 
-void Rope::Render(GLUquadric& quadric) const
+void Rope::Render() const
 {
 	if (!m_particles.empty())
 	{
@@ -83,14 +83,14 @@ void Rope::Render(GLUquadric& quadric) const
 			//	radius = 0.1f;
 			//}
 		
-			DebugRender::Sphere(quadric, p.m_pos, radius, brown);
+			DebugRender::Sphere(p.m_pos, radius, brown);
 		}
 
 		for (size_t i = 1; i < m_particles.size(); ++i)
 		{
 			const Particle& pa = m_particles[i];
 			const Particle& pb = m_particles[i - 1];
-			DebugRender::Cylinder(quadric, pa.m_pos, pb.m_pos, radius, brown);
+			DebugRender::Cylinder(pa.m_pos, pb.m_pos, radius, brown);
 		}
 	}
 }
@@ -99,4 +99,9 @@ void Rope::AddParticle(const Vec3& pos, float mass)
 {
 	Particle* prev = m_particles.empty() ? NULL : &m_particles.back();
 	m_particles.push_back(Particle(pos, mass, prev));
+}
+
+Particle* Rope::GetLastParticle()
+{
+	return m_particles.empty() ? NULL : &m_particles.back();
 }
