@@ -18,7 +18,7 @@ public:
 class Rope
 {
 public:
-	void Integrate(float dt);
+	void IntegratePosVel(float dt);
 	void SolveConstraints(float dt);
 	void Render() const;
 	void AddParticle(const Vec3& pos, float mass);

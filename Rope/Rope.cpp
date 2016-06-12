@@ -18,7 +18,7 @@ Particle::Particle(const Vec3& pos, float mass, Particle* prev)
 
 ///////////////////////////////////////////////////////////////////////////
 
-void Rope::Integrate(float dt)
+void Rope::IntegratePosVel(float dt)
 {
 	for (Particle& p : m_particles)
 	{
@@ -44,15 +44,16 @@ void Rope::SolveConstraints(float dt)
 		{
 			Particle& pa = m_particles[partIndex];
 			Particle& pb = m_particles[partIndex - 1];
-			Vec3 delta = pa.m_pos - pb.m_pos;
 			float denom = pa.m_invMass + pb.m_invMass;
 			if (denom > FLT_EPSILON)
 			{
+				// Calculate how far from the resting distance the particles are
 				Vec3 delta = pa.m_pos - pb.m_pos;
 				float deltaMag = delta.Mag();
 				Vec3 deltaNorm = delta / deltaMag;
 				float displacement = deltaMag - pa.m_dist;
 
+				// Move the particles back to the correct distance, based on their relative masses
 				Vec3 impulse = -deltaNorm * displacement;
 				pa.m_pos += impulse * (pa.m_invMass / denom);
 				pb.m_pos -= impulse * (pb.m_invMass / denom);
@@ -70,19 +71,6 @@ void Rope::Render() const
 
 		for (const Particle& p : m_particles)
 		{
-			//float radius;
-			//if (p.m_invMass > FLT_EPSILON)
-			//{
-			//	float mass = 1.f / p.m_invMass;
-			//	static const float density = 100.f;
-			//	static const float PI = 3.14159265f;
-			//	radius = powf((3.f * mass) / (4.f * PI * density), 1.f / 3.f);
-			//}
-			//else
-			//{
-			//	radius = 0.1f;
-			//}
-		
 			DebugRender::Sphere(p.m_pos, radius, brown);
 		}
 

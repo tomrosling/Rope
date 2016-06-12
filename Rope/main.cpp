@@ -1,4 +1,3 @@
-
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <gl/GLU.h>
@@ -11,7 +10,6 @@
 #include "Camera.h"
 #include "Picker.h"
 #include "DebugRender.h"
-
 
 int main(int argc, char** argv)
 {
