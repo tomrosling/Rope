@@ -4,7 +4,7 @@
 
 Particle::Particle(const Vec3& pos, float mass, Particle* prev)
 	: m_pos(pos)
-	, m_vel(0.f, 0.f, 0.f)
+	, m_prevPos(pos)
 	, m_mass(mass)
 	, m_invMass(mass ? 1.f / mass : 0.f)
 	, m_dist(prev ? (pos - prev->m_pos).Mag() : 0.f)
@@ -24,21 +24,18 @@ void Rope::Integrate(float dt)
 		static const Vec3 gravity(0.f, -9.8f, 0.f);
 		if (p.m_invMass > 0.f)
 		{
-			p.m_vel += gravity * dt;
-			p.m_pos += p.m_vel * dt;
+			Vec3 deltaPos = p.m_pos - p.m_prevPos;
+			deltaPos *= expf(-0.1f * dt);
+			p.m_prevPos = p.m_pos;
+			p.m_pos += gravity * dt * dt;
+			p.m_pos += deltaPos;
 		}
 	}
-
-	//	if (!m_particles.empty())
-	//	{
-	//		m_particles.front().m_pos = Vec3(0.f, 3.f, 0.f);
-	//		m_particles.front().m_vel = Vec3(0.f, 0.f, 0.f);
-	//	}
 }
 
 void Rope::SolveConstraints(float dt)
 {
-	static const int numIterations = 100;
+	static const int numIterations = 10;
 	for (int iter = 0; iter < numIterations; ++iter)
 	{
 		for (size_t partIndex = 1; partIndex < m_particles.size(); ++partIndex)
@@ -46,43 +43,20 @@ void Rope::SolveConstraints(float dt)
 			Particle& pa = m_particles[partIndex];
 			Particle& pb = m_particles[partIndex - 1];
 			Vec3 delta = pa.m_pos - pb.m_pos;
-			float myDist = delta.Mag();
 			float denom = pa.m_invMass + pb.m_invMass;
 			if (denom > FLT_EPSILON)
 			{
-				// Find desired relvel for these particles
-				//	float maxImpulse = -k * displacement * dt;
+				Vec3 delta = pa.m_pos - pb.m_pos;
+				float deltaMag = delta.Mag();
+				Vec3 deltaNorm = delta / deltaMag;
+				float displacement = deltaMag - pa.m_dist;
 
+				// TODO: limit this based on spring stiffness or arbitrary
+				// to avoid spazzing when pulling
+				Vec3 impulse = -deltaNorm * displacement;
 
-				// Use this to solve?
-
-				//if (myDist > pa.m_dist)
-				{
-					static /*const*/ float k = 500.f;
-					static /*const*/ float b = 0.f;
-
-					float displacement = myDist - pa.m_dist;
-
-					// Work out what the displacement will be in the next frame
-					Vec3 newPosA = pa.m_pos + pa.m_vel * dt;
-					Vec3 newPosB = pb.m_pos + pb.m_vel * dt;
-					float newDisplacement = (newPosA - newPosB).Mag() - pa.m_dist;
-
-					Vec3 n = delta.GetNormalised();
-					Vec3 relVel = pa.m_vel - pb.m_vel;
-					Vec3 impulse = (-n * k * newDisplacement - relVel * b) * dt;
-					float i = impulse.Mag();
-					static float breakp = 10.f;
-					if (i > breakp)
-					{
-						int b = 0;
-					}
-
-
-					pa.m_vel += impulse * (pa.m_invMass / denom);
-					pb.m_vel -= impulse * (pb.m_invMass / denom);
-					//particle.m_pos = prevParticle.m_pos + n * particle.m_dist;
-				}
+				pa.m_pos += impulse * (pa.m_invMass / denom);
+				pb.m_pos -= impulse * (pb.m_invMass / denom);
 			}
 		}
 	}
@@ -92,25 +66,32 @@ void Rope::Render(GLUquadric& quadric) const
 {
 	if (!m_particles.empty())
 	{
-		//	glLoadIdentity();
-		//	glBegin(GL_LINE_STRIP);
-		//	//glBegin(GL_TRIANGLES);
-		//	for (const Particle& p : m_particles)
-		//	{
-		//		glVertex3fv(reinterpret_cast<const GLfloat*>(&p.m_pos));
-		//	}
-		//	glEnd();
+		static const float radius = 0.02f;
+		static const Vec3 brown(0.54f, 0.27f, 0.08f);
 
 		for (const Particle& p : m_particles)
 		{
-			DebugRender::Sphere(quadric, p.m_pos, 0.1f);
+			//float radius;
+			//if (p.m_invMass > FLT_EPSILON)
+			//{
+			//	float mass = 1.f / p.m_invMass;
+			//	static const float density = 100.f;
+			//	static const float PI = 3.14159265f;
+			//	radius = powf((3.f * mass) / (4.f * PI * density), 1.f / 3.f);
+			//}
+			//else
+			//{
+			//	radius = 0.1f;
+			//}
+		
+			DebugRender::Sphere(quadric, p.m_pos, radius, brown);
 		}
 
 		for (size_t i = 1; i < m_particles.size(); ++i)
 		{
 			const Particle& pa = m_particles[i];
 			const Particle& pb = m_particles[i - 1];
-			DebugRender::Cylinder(quadric, pa.m_pos, pb.m_pos, 0.1f);
+			DebugRender::Cylinder(quadric, pa.m_pos, pb.m_pos, radius, brown);
 		}
 	}
 }
