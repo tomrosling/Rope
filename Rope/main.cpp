@@ -1,9 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <gl/GLU.h>
-
 #include <cassert>
-
 #include "Maths.h"
 #include "Rope.h"
 #include "Integrator.h"
