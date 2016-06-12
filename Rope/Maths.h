@@ -281,3 +281,9 @@ struct Mat44
 		return outMat;
 	}
 };
+
+template<typename T>
+T Clamp(T x, T min, T max)
+{
+	return (x < min) ? min : ((x > max) ? max : x);
+}

@@ -25,8 +25,9 @@ void Rope::Integrate(float dt)
 		static const Vec3 gravity(0.f, -9.8f, 0.f);
 		if (p.m_invMass > 0.f)
 		{
+			static const float damping = 0.1f;
 			Vec3 deltaPos = p.m_pos - p.m_prevPos;
-			deltaPos *= expf(-0.1f * dt);
+			deltaPos *= expf(-damping * dt);
 			p.m_prevPos = p.m_pos;
 			p.m_pos += gravity * dt * dt;
 			p.m_pos += deltaPos;
@@ -52,10 +53,7 @@ void Rope::SolveConstraints(float dt)
 				Vec3 deltaNorm = delta / deltaMag;
 				float displacement = deltaMag - pa.m_dist;
 
-				// TODO: limit this based on spring stiffness or arbitrary
-				// to avoid spazzing when pulling
 				Vec3 impulse = -deltaNorm * displacement;
-
 				pa.m_pos += impulse * (pa.m_invMass / denom);
 				pb.m_pos -= impulse * (pb.m_invMass / denom);
 			}
