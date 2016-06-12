@@ -15,15 +15,15 @@
 
 int main(int argc, char** argv)
 {
-	// Request a 24-bits depth buffer when creating the window
+	// Make sure the OpenGL context has a depth buffer
 	sf::ContextSettings contextSettings;
 	contextSettings.depthBits = 24;
 
-	// Create window
+	// Create our SFML window
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Rope Simulation", sf::Style::Default, contextSettings);
 	window.setVerticalSyncEnabled(true);
 
-	// Make it the active window for OpenGL calls
+	// Make it the active window for GL calls
 	window.setActive();
 
 	// Set up the GL state
@@ -40,18 +40,17 @@ int main(int argc, char** argv)
 		rope.AddParticle(startPos + Vec3(static_cast<float>(i) * separation, 0.f, 0.f), 1.f);
 	}
 
-	// Stateful objects for timing, fixed time-step integration and mouse picking
+	// Stateful objects for timing, fixed time-step integration, camera and mouse picking
 	sf::Clock clock;
 	Integrator integrator;
 	Picker picker;
 	Camera camera;
 
-	// Start main loop
+	// Main loop:
 	while (window.isOpen())
 	{
+		// Get time delta and clamp to something sane
 		float dt = clock.restart().asSeconds();
-
-		// Clamp dt to something sane
 		const float clamp = 0.2f;
 		if (dt > clamp)
 		{
@@ -78,13 +77,14 @@ int main(int argc, char** argv)
 		// Process physics
 		integrator.Integrate(rope, dt);
 
-		// Clear the depth buffer
+		// Clear the graphics buffers
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		// Update camera and picking
 		camera.Update(dt);
 		picker.Pick(window, camera.GetPos(), camera.GetLookAt(), rope);
 
+		// Render the scene
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
