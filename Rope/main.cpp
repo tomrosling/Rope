@@ -29,8 +29,8 @@ int main(int argc, char** argv)
 	Rope rope;
 	Vec3 startPos(0.f, 3.f, 0.f);
 	rope.AddParticle(startPos, 0.f);
-	static const int numParticles = 20;
-	static const float separation = 0.25f;
+	static const int numParticles = 50;
+	static const float separation = 0.1f;
 	for (int i = 1; i < numParticles; ++i)
 	{
 		rope.AddParticle(startPos + Vec3(static_cast<float>(i) * separation, 0.f, 0.f), 1.f);
