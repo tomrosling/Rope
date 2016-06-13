@@ -1,0 +1,6 @@
+# Rope
+Code sample: Rope simulation
+
+Set up to compile under Visual Studio 2013.
+
+Use the left mouse button to drag the end of the rope around the screen, without modifying its distance from the camera. The camera slowly rotates, but will stop when the mouse is clicked.
