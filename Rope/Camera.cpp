@@ -13,10 +13,6 @@ Camera::Camera()
 
 void Camera::Update(float dt)
 {
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPushMatrix();
-
 	// Slowly rotate the camera, as long as we're not picking
 	static const float radius = 5.f;
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -31,6 +27,8 @@ void Camera::Update(float dt)
 	m_pos = Vec3(radius * cosf(m_angle), 0.f, radius * sinf(m_angle));
 	m_lookAt = Vec3(0.f, 0.f, 0.f);
 
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 	gluLookAt(
 		m_pos.x, m_pos.y, m_pos.z,
 		m_lookAt.x, m_lookAt.y, m_lookAt.z,

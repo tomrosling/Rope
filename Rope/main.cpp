@@ -80,10 +80,7 @@ int main(int argc, char** argv)
 		camera.Update(dt);
 		picker.Pick(window, camera.GetPos(), camera.GetLookAt(), rope);
 
-		// Render the scene
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
+		// Render the rope
 		rope.Render();
 
 		// Render a ground plane

@@ -16,11 +16,11 @@ void DebugRender::Initialise(int windowSizeX, int windowSizeY)
 
 	// Set up lighting
 	GLfloat	globalAmbient[] = { 0.3f, 0.3f, 0.3f, 1.f };
-	GLfloat light0AmbDiff[] = { 0.9f, 0.9f, 0.7f, 1.f };
+	GLfloat light0Diff[] = { 0.9f, 0.9f, 0.7f, 1.f };
 	GLfloat light0Pos[] = { 0.f, 0.f, 5.f, 1.0 };
 	glEnable(GL_LIGHTING);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
-	glLightfv(GL_LIGHT0, GL_AMBIENT_AND_DIFFUSE, light0AmbDiff);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0Diff);
 	glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
 	glEnable(GL_LIGHT0);
 
@@ -69,6 +69,7 @@ void DebugRender::Sphere(const Vec3& point, float radius, const sf::Color& colou
 {
 	SetColour(colour);
 
+	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glTranslatef(point.x, point.y, point.z);
 	gluSphere(s_quadric, radius, 12, 12);
@@ -84,6 +85,7 @@ void DebugRender::Cylinder(const Vec3& a, const Vec3& b, float radius, const sf:
 	float angle = 0.f;
 	Vec3::GetAxisAndAngleBetween(axis, angle, Vec3(0.f, 0.f, 1.f), b - a);
 
+	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glTranslatef(a.x, a.y, a.z);
 	glRotatef(angle * 180.f / PI, axis.x, axis.y, axis.z);

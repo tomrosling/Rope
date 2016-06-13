@@ -14,6 +14,6 @@ void Integrator::Integrate(Rope& rope, float dt)
 	{
 		m_timeAccumulator -= timeStep;
 		rope.IntegratePosVel(timeStep);
-		rope.SolveConstraints(timeStep);
+		rope.SolveConstraints();
 	}
 }

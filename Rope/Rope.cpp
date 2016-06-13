@@ -6,7 +6,6 @@
 Particle::Particle(const Vec3& pos, float mass, Particle* prev)
 	: m_pos(pos)
 	, m_prevPos(pos)
-	, m_mass(mass)
 	, m_invMass(mass ? 1.f / mass : 0.f)
 	, m_dist(prev ? (pos - prev->m_pos).Mag() : 0.f)
 {
@@ -25,6 +24,7 @@ void Rope::IntegratePosVel(float dt)
 		static const Vec3 gravity(0.f, -9.8f, 0.f);
 		if (p.m_invMass > 0.f)
 		{
+			// Verlet integration: Calculate velocity from position delta
 			static const float damping = 0.1f;
 			Vec3 deltaPos = p.m_pos - p.m_prevPos;
 			deltaPos *= expf(-damping * dt);
@@ -35,7 +35,7 @@ void Rope::IntegratePosVel(float dt)
 	}
 }
 
-void Rope::SolveConstraints(float dt)
+void Rope::SolveConstraints()
 {
 	static const int numIterations = 10;
 	for (int iter = 0; iter < numIterations; ++iter)
@@ -45,15 +45,17 @@ void Rope::SolveConstraints(float dt)
 			Particle& pa = m_particles[partIndex];
 			Particle& pb = m_particles[partIndex - 1];
 			float denom = pa.m_invMass + pb.m_invMass;
-			if (denom > FLT_EPSILON)
+
+			// Calculate how far from the resting distance the particles are
+			Vec3 delta = pa.m_pos - pb.m_pos;
+			float deltaMag = delta.Mag();
+
+			if ((denom > FLT_EPSILON) && (deltaMag > FLT_EPSILON))
 			{
-				// Calculate how far from the resting distance the particles are
-				Vec3 delta = pa.m_pos - pb.m_pos;
-				float deltaMag = delta.Mag();
 				Vec3 deltaNorm = delta / deltaMag;
 				float displacement = deltaMag - pa.m_dist;
 
-				// Move the particles back to the correct distance, based on their relative masses
+				// Move the particles back to the correct distance, split based on their relative masses
 				Vec3 impulse = -deltaNorm * displacement;
 				pa.m_pos += impulse * (pa.m_invMass / denom);
 				pb.m_pos -= impulse * (pb.m_invMass / denom);
