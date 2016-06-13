@@ -9,7 +9,8 @@
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
+#[Rr]elease/
+Rope/[Rr]elease/
 x64/
 build/
 bld/
@@ -39,7 +40,7 @@ dlldata.c
 *.meta
 *.obj
 *.pch
-*.pdb
+#*.pdb
 *.pgc
 *.pgd
 *.rsp
